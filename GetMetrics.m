@@ -22,19 +22,72 @@ function [dlds...
                                        right_side_indices,...
                                        heel_side_indices,...
                                        toe_side_indices)
-% GetMetrics(FILENAMES, GROUPINGS, LEFT_SIDE_INDICES, RIGHT_SIDE_INDICES, HEEL_SIDE_INDICES, TOE_SIDE_INDICES)
+% GetMetrics(FILENAMES, FEET, GROUPINGS, OUTER_SIDE_INDICES, INNER_SIDE_INDICES, HEEL_SIDE_INDICES, TOE_SIDE_INDICES)
 % 
+%   Parameters:
+%     FILENAMES  A cell array of filename paths to *.mat files with left_foot
+%                right_foot matrices
 %
+%     FEET       A cell array of one or two elements with values 'left' and/or
+%                'right'
 %
+%     GROUPINGS  A cell array of vectors corresponding to groupings of
+%                individual sensors. These vectors should only have values
+%                raning from 1 to 99 for the Pedar shoe mapping. This cell
+%                array can be generated using the GetSensorGroupingsFromPedar
+%                function.
 %
+%     OUTER_SIDE_INDICES  A vector of indices of the sensor groupings in
+%                         GROUPINGS sensor that correspond to the outer side of
+%                         the foot. This can be generated from the
+%                         GetSensorGroupingsFromPedar function.
 %
+%     INNER_SIDE_INDICES  A vector of indices of the sensor groupings in
+%                         GROUPINGS sensor that correspond to the inner side of
+%                         the foot. This can be generated from the
+%                         GetSensorGroupingsFromPedar function.
 %
+%     HEEL_SIDE_INDICES  A vector of indices of the sensor groupings in
+%                        GROUPINGS sensor that correspond to the heel side of
+%                        the foot. This can be generated from the
+%                        GetSensorGroupingsFromPedar function.
 %
+%     TOE_SIDE_INDICES  A vector of indices of the sensor groupings in
+%                       GROUPINGS sensor that correspond to the toe side of
+%                       the foot. This can be generated from the
+%                       GetSensorGroupingsFromPedar function.
 %
+%   Output:
+%     The variables outputted are in the following order.
 %
+%     DLDS  A vector of length N with change in length of step values.
 %
+%     AMP  A vector of length N with average maximum amplitude values at each
+%          step.
 %
-
+%     LATERAL  A vector of length N with differences between the average
+%              maximum outer and average inner amplitudes.
+%
+%     HEELTOE  A vector of length N with differences between the average heel
+%              land time and average toe land time.
+%
+%     DLDS_AT_SENSOR  A matrix of size NxM with change in length of step values
+%                     measured at each of the M sensor groupings.
+%
+%     AMP_AT_SENSOR  A matrix of size NxM with max amplitude values at each
+%                    step for each of the M sensor groupings.
+%
+%     LAND_AT_SENSOR  A matrix of size NxM with land times at each step for
+%                     each of the M sensor groupings.
+%
+%     STEP_STARTS  A vector of length N of step start times.
+%
+%     STEP_ENDS  A vector of length N of step end times.
+%
+%     ...  Another nine more variables like those above are returned. These are
+%          the TEST_DLDS, TEST_AMP, TEST_LATERAL, TEST_HEELTOE,
+%          TEST_DLDS_AT_SENSOR, etc. variables to be used in testing. These are
+%          20% of the data loaded from INPUT.
 THRESHOLD_FRACTION = 0.15;
 TESTING_PORTION = 0.2;
 
