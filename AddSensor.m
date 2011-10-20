@@ -1,5 +1,5 @@
-function [s s_v m] = AddSensor(s_0, ...
-                               s_v0, ...
+function [s v m] = AddSensor(s_0, ...
+                               v_0, ...
                                g, ...
                                K, ...
                                dlds, ...
@@ -47,21 +47,8 @@ function [s s_v m] = AddSensor(s_0, ...
 %    i -- choice
 %    j -- metric
 %      -- prediction error of metric j in choice i
-%
-% ------------
-% CONSTRAINTS:
-% ------------
-%
-% required globals:
-%   -- dlds
-%   -- amp
-%   -- lateral
-%   -- heeltoe
-%   -- dlds_at_sensor
-%   -- amp_at_sensor
-%   -- land_at_sensor
-%   -- RANKING_ERROR_THRESHOLDS
-%   -- RANKING_ERROR_DIRECTIONS
+
+  LoadConstants;
 
   num_sensors = length(g);
 
@@ -102,7 +89,7 @@ function [s s_v m] = AddSensor(s_0, ...
   end
 
   % strip off trailing predictions from initialization
-  m = m(1:count,:);
+  m = m(1:sensors_added,:);
 
   % rank predictors
   [ranked_indices, thresholds_reached] = ...
