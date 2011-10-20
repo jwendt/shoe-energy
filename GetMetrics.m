@@ -18,8 +18,8 @@ function [dlds...
           test_step_ends] = GetMetrics(input,...
                                        feet,...
                                        groupings_list,...
-                                       left_side_indices,...
-                                       right_side_indices,...
+                                       outer_side_indices,...
+                                       inner_side_indices,...
                                        heel_side_indices,...
                                        toe_side_indices)
 % GetMetrics(FILENAMES, FEET, GROUPINGS, OUTER_SIDE_INDICES, INNER_SIDE_INDICES, HEEL_SIDE_INDICES, TOE_SIDE_INDICES)
@@ -147,8 +147,8 @@ for i = 1:length(input)
     % Calculate metrics
     % TODO: GetMetrics does not know how to compute lateral and heeltoe from
     %       the sensor groupings defined by GetSensorGroupingsFromPedar (main
-    %       issue is we're calculating lateral using left_side_indices and
-    %       right_side_indices, when really we should only be using the defaults.
+    %       issue is we're calculating lateral using outer_side_indices and
+    %       inner_side_indices, when really we should only be using the defaults.
     fprintf('Calculating %s foot metrics\n', feet{f});
     [left_dlds...
      left_amp...
@@ -160,8 +160,8 @@ for i = 1:length(input)
                                                            left_step_starts,...
                                                            left_step_ends,...
                                                            THRESHOLD_FRACTION,...
-                                                           left_side_indices,...
-                                                           right_side_indices,...
+                                                           outer_side_indices,...
+                                                           inner_side_indices,...
                                                            heel_side_indices,...
                                                            toe_side_indices);
     % Plotting functions below are unnecessary
@@ -303,7 +303,7 @@ function [dlds...
                                                            varargin)
 % GetMetricsFromSingleDataSource(DATA, STEP_STARTS, STEP_ENDS, THREHOLD)
 %
-% GetMetricsFromSingleDataSource(DATA, STEP_STARTS, STEP_ENDS, THREHOLD, LEFT_SIDE_INDICES, RIGHT_SIDE_INDICES, HEEL_SIDE_INDICES, TOE_SIDE_INDICS)
+% GetMetricsFromSingleDataSource(DATA, STEP_STARTS, STEP_ENDS, THREHOLD, OUTER_SIDE_INDICES, INNER_SIDE_INDICES, HEEL_SIDE_INDICES, TOE_SIDE_INDICS)
 %
 %    GetMetricsFromSingleDataSource returns measurements for change in step stride (dlds),
 %    maximum amplitude (amp), lateral difference between left and right
@@ -312,13 +312,13 @@ function [dlds...
 %    length(STEP_STARTS) and length(STEP_ENDS) must be the same.
 LoadConstants;
 if (length(varargin) == 4)
-  left_side_indices = varargin{1};
-  right_side_indices = varargin{2};
+  outer_side_indices = varargin{1};
+  inner_side_indices = varargin{2};
   heel_side_indices = varargin{3};
   toe_side_indices = varargin{4};
 elseif (length(varargin) == 0)
-  left_side_indices = config.left_side_indices;
-  right_side_indices = config.right_side_indices;
+  outer_side_indices = config.outer_side_indices;
+  inner_side_indices = config.inner_side_indices;
   heel_side_indices = config.heel_side_indices;
   toe_side_indices = config.toe_side_indices;
 else
@@ -390,16 +390,16 @@ for mi=1:num_steps
   % Nifty little bit of code here essentially does a cross product of the
   % left_sensor_amp and right_sensor_amp vectors using the division function
   % between them (L ./ R)
-  left_sensor_amp = amp_at_sensor(mi, left_side_indices)';
-  right_sensor_amp = amp_at_sensor(mi, right_side_indices);
+  left_sensor_amp = amp_at_sensor(mi, outer_side_indices)';
+  right_sensor_amp = amp_at_sensor(mi, inner_side_indices);
   L = repmat(left_sensor_amp, 1, length(right_sensor_amp));
   R = repmat(right_sensor_amp, length(left_sensor_amp), 1);
-  lateral_at_sensor(mi, left_side_indices, right_side_indices) = L - R;
+  lateral_at_sensor(mi, outer_side_indices, inner_side_indices) = L - R;
 
-  %lateral(mi) = sum(amp_at_sensor(mi,left_side_indices)) / sum(amp_at_sensor(mi, right_side_indices));
-  % We only use config.left_side_indices and config.right_side_indices to
+  %lateral(mi) = sum(amp_at_sensor(mi,outer_side_indices)) / sum(amp_at_sensor(mi, inner_side_indices));
+  % We only use config.outer_side_indices and config.inner_side_indices to
   % accurately describe the lateral difference
-  lateral(mi) = mean(amp_at_sensor(mi,config.left_side_indices)) - mean(amp_at_sensor(mi, config.right_side_indices));
+  lateral(mi) = mean(amp_at_sensor(mi,config.outer_side_indices)) - mean(amp_at_sensor(mi, config.inner_side_indices));
 end
 
 fprintf('  heeltoe\n');

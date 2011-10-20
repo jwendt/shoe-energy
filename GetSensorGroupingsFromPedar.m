@@ -1,7 +1,7 @@
 function [groupings_list...
           groupings_matrix...
-          left_side_indices...
-          right_side_indices...
+          outer_side_indices...
+          inner_side_indices...
           heel_side_indices...
           toe_side_indices] = GetSensorGroupingsFromPedar(varargin)
 % GetSensorGroupingsFromPedar   Returns a cell array of N sensor groupings (vectors) as
@@ -82,8 +82,8 @@ shoe_image = [ NaN 96 97 98 99  NaN  NaN;
 
 % Get left, right, heel, and toe indices, from here, we work
 LoadConstants;
-shoe_right = config.right_side_indices;
-shoe_left = config.left_side_indices;
+shoe_right = config.inner_side_indices;
+shoe_left = config.outer_side_indices;
 shoe_heel = config.heel_side_indices;
 shoe_toe = config.toe_side_indices;
 
@@ -96,8 +96,8 @@ shoe_image = flipud(shoe_image);
 num_groupings = 0;
 groupings_list = {};
 groupings_matrix = [];
-left_side_indices = [];
-right_side_indices = [];
+outer_side_indices = [];
+inner_side_indices = [];
 heel_side_indices = [];
 toe_side_indices = [];
 
@@ -145,9 +145,9 @@ for grouping_index = 1:size(masks,2)
         % we deem this sensor grouping to be on the left side, vice versa for
         % the right side, and likewise for the heel and toe side
         if(sum(ismember(sensors, shoe_left)) > sum(ismember(sensors, shoe_right)))
-          left_side_indices = [left_side_indices num_groupings];
+          outer_side_indices = [outer_side_indices num_groupings];
         elseif(sum(ismember(sensors, shoe_right)) > sum(ismember(sensors, shoe_left)))
-          right_side_indices = [right_side_indices num_groupings];
+          inner_side_indices = [inner_side_indices num_groupings];
         end
 
         if(sum(ismember(sensors, shoe_heel)) > sum(ismember(sensors, shoe_toe)))
