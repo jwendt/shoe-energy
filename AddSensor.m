@@ -47,22 +47,23 @@ function [s v m] = AddSensor(s_0, ...
 %    i -- choice
 %    j -- metric
 %      -- prediction error of metric j in choice i
-
   LoadConstants;
 
   num_sensors = length(g);
 
-  s = zeros(num_sensors, num_sensors);
+  s = logical(zeros(num_sensors, num_sensors));
   m = zeros(num_sensors, 4);
 
-  sensors_added = 0;
+  h = waitbar(0, sprintf('... Adding Sensors ...'));
+  sensors_added = 1;
   for j = 1:num_sensors
+    waitbar(j / num_sensors, h);
     % ignore sensor if it's already in the chosen list
-    if s_0(j) == 1
+    if s_0(j)
       continue;
     end
     % ignore sensor if it's not a valid sensor
-    if v_0(j) == 0
+    if ~v_0(j)
       continue;
     end
 
@@ -72,19 +73,20 @@ function [s v m] = AddSensor(s_0, ...
 
     % compute prediction errors
     dlds_errors = ComputePredictionError(dlds, ...
-        dlds_at_sensor([s_0 s]));
+        dlds_at_sensor(s(sensors_added,:)));
     amp_errors = ComputePredictionError(amp, ...
-        amp_at_sensor([s_0 s]));
+        amp_at_sensor(s(sensors_added,:)));
     lateral_errors = ComputePredictionError(lateral, ...
-        land_at_sensor([s_0 s]));
+        land_at_sensor(s(sensors_added,:)));
     heeltoe_errors = ComputePredictionError(heeltoe, ...
-        land_at_sensor([s_0 s]));
+        land_at_sensor(s(sensors_added,:)));
 
     % combine errors
     m(sensors_added,:) = CombineErrors(dlds_errors, ...
                                        amp_errors, ...
                                        lateral_errors, ...
                                        heeltoe_errors);
+
     sensors_added = sensors_added + 1;
   end
 
@@ -106,12 +108,12 @@ function [s v m] = AddSensor(s_0, ...
 
   % invalidate sensors that are either predictors or
   % connected to predictors
-  v = zeros(length(ranked_indices), num_sensors);
-  for i = 1:length(s)
+  v = logical(zeros(length(ranked_indices), num_sensors));
+  for i = 1:length(ranked_indices)
     v(i,:) = v_0;
     v(i,s(i,:)) = 0;
     for j = 1:num_sensors
-      v(g(s(i,:),j) == 1) = 0;
+      v(g(s(i,:),j)) = 0;
     end
   end
 
