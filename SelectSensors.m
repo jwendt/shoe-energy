@@ -9,6 +9,43 @@ function [s v m] = SelectSensors(sensors_to_select, ...
                                  dlds_at_sensor, ...
                                  amp_at_sensor, ...
                                  land_at_sensor)
+% SelectSensors Returns top K sets of predictors.
+%
+% -------
+% INPUTS:
+% -------
+%
+%   sensors_to_select: number of steps to take (total number
+%                      of sensors to select)
+%   g: logical adjacency matrix
+%      i: sensor
+%      j: sensor
+%         -- 1 if sensors i and j give similar predictions
+%            for all metrics
+%   K1: number of new predictor sets to return for each call
+%   K2: number of new predictor sets to return for each step
+%   dlds...heeltoe: metrics to predict
+%   *_at_sensor: predictor metrics at each sensor
+%
+% --------
+% OUTPUTS:
+% --------
+%
+% s: ranked vector of logical vectors of new predictors
+%    i -- step
+%    j -- choice
+%    k -- sensor
+%      -- 1 if sensor k is a predictor in choice j at step i
+% v: logical vectors of new sensor validity
+%    i -- step
+%    j -- choice
+%    k -- sensor
+%      -- 1 if sensor k should be considered in choice j at step i
+% m: vector of metric prediction errors
+%    i -- step
+%    j -- choice
+%    k -- metric
+%      -- prediction error of metric k in choice j at step i
   LoadConstants;
 
   [num_steps num_sensors] = size(dlds_at_sensor);

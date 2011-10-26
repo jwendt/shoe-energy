@@ -35,15 +35,15 @@ function [s v m] = AddSensor(s_0, ...
 % OUTPUTS:
 % --------
 %
-% s: logical vectors of new predictors
+% s: ranked logical vectors of new predictors
 %    i -- choice
 %    j -- sensor
 %      -- 1 if sensor j is a predictor in choice i
-% v: logical vectors of new sensor validity
+% v: ranked logical vectors of new sensor validity
 %    i -- choice
 %    j -- sensor
 %      -- 1 if sensor j should be considered in choice i
-% m: vector of metric prediction errors
+% m: ranked vector of metric prediction errors
 %    i -- choice
 %    j -- metric
 %      -- prediction error of metric j in choice i
