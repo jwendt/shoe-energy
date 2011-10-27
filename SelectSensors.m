@@ -44,7 +44,7 @@ function [s v m] = SelectSensors(sensors_to_select, ...
 % m: vector of metric prediction errors
 %    i -- step
 %    j -- choice
-%    k -- metric
+%    k -- metric (1:dlds, 2:amp, 3:lateral, 4:heeltoe)
 %      -- prediction error of metric k in choice j at step i
   LoadConstants;
 
