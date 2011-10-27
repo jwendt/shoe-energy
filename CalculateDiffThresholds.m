@@ -1,15 +1,33 @@
 function [dlds_threshold ...
           amp_threshold ...
           lateral_threshold ...
-          heeltoe_threshold] = CalculateDiffThresholds(prediction_graph)
+          heeltoe_threshold] = CalculateDiffThresholds(prediction_graph, ...
+                                                       dlds_quantile, ...
+                                                       amp_quantile, ...
+                                                       lateral_quantile, ...
+                                                       heeltoe_quantile)
 % CalcluateDiffThresholds Calculates thresholds for sensor graph pruning.
+%                         Higher threshold (quantile) means faster runtime.
+%
+% -------
+% INPUTS:
+% -------
+%
+%   prediction_graph: graph of prediction strength diffs
+%   *_quantile: quantile for metric, from which threshold is calculated
+%
+% --------
+% OUTPUTS:
+% --------
+%
+%   *_threshold: threshold below which edge should be added (pruned)
 
   g = abs(prediction_graph);
   dlds_threshold = quantile(reshape(g(:,:,1), 1, ...
-                                    numel(g(:,:,1))), 0.5);
+                                    numel(g(:,:,1))), dlds_quantile);
   amp_threshold = quantile(reshape(g(:,:,2), 1, ...
-                                  numel(g(:,:,2))), 0.5);
+                                  numel(g(:,:,2))), amp_quantile);
   lateral_threshold = quantile(reshape(g(:,:,3), 1, ...
-                                      numel(g(:,:,3))), 0.5);
+                                      numel(g(:,:,3))), lateral_quantile);
   heeltoe_threshold = quantile(reshape(g(:,:,4), 1, ...
-                                      numel(g(:,:,4))), 0.5);
+                                      numel(g(:,:,4))), heeltoe_quantile);
