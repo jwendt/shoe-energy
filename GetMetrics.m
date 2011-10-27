@@ -504,7 +504,11 @@ end
 
 %fprintf('number_of_steps = %d, \n', number_of_steps);
 if(number_of_steps < 3)
-  dlds = -999999; %nan; %-9999
+  % TODO If dlds cannot be measured at a given sensor (due to missing a step),
+  % technically that sensor shoudl still trigger once the following step comes,
+  % effectively doubling its measured dlds value. For simplicity, we just set
+  % dlds to 0.
+  dlds = 0; %nan; %-9999
 else
   dlds = (step_start_sum(3) - step_start_sum(2)) - (step_start_sum(2) - step_start_sum(1));
 end
