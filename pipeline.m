@@ -98,3 +98,15 @@ g = PruneGraph(prediction_graph, ...
                heeltoe_threshold);
 
 % Do CICA
+
+[s v m] = SelectSensors(10,
+                        g,
+                        20,
+                        20,
+                        dlds,
+                        amp,
+                        lateral,
+                        heeltoe,
+                        dlds_at_sensor,
+                        amp_at_sensor,
+                        land_at_sensor);
