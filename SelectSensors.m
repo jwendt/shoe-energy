@@ -57,8 +57,9 @@ function [s v m] = SelectSensors(sensors_to_select, ...
   s_0 = logical(zeros(1, num_sensors));
   v_0 = logical(ones(1, num_sensors));
 
+  h = waitbar(0, '');
   for select = 1:sensors_to_select
-    h = waitbar(0, sprintf('... Selecting Sensor %d ...', select));
+    waitbar(0, h, sprintf('... Selecting Sensor %d ...', select));
 
     s_K2 = logical(zeros(K1*K2, num_sensors));
     v_K2 = logical(ones(K1*K2, num_sensors));
@@ -110,3 +111,5 @@ function [s v m] = SelectSensors(sensors_to_select, ...
     v(select,:,:) = v_0;
     m(select,:,:) = m_0;
   end
+  close(h)
+
