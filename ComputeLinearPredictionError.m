@@ -1,17 +1,19 @@
-function err = ComputeLinearPredictionError(actual, predictors)
-% ComputeLinearPreditionError Computes the error given the actual measurements
-%                             and the predictors' measurements. The error is
+function err = ComputeLinearPredictionError(train, train_predictors, test, test_predictors)
+% ComputeLinearPreditionError
+%    Finds the linear equation to apply 
+%                             and the train_predictors' measurements. The error is
 %                             computed by measuring the differences between the
-%                             actual values and the linear model trained from
-%                             the predictors and the actual values.
+%                             train values and the linear model trained from
+%                             the train_predictors and the train values.
 %
-%    ComputeLinearPredictionError(ACTUAL, PREDICTORS)
+%    ComputeLinearPredictionError(TRAIN, TRAIN_PREDICTORS)
 %
-%      ACTUAL is a vector of size N of actual values
+%      TRAIN is a vector of size N of train values
 %
-%      PREDICTORS is a matrix of size NxM with M predictor measurements
-[num_observations num_predictors] = size(predictors);
-X = [ones(size(actual)) predictors];
-b = regress(actual, X);
-y = X*b;
-err = y - actual;
+%      TRAIN_PREDICTORS is a matrix of size NxM with M predictor measurements
+[num_observations num_train_predictors] = size(train_predictors);
+Xtrain = [ones(size(train)) train_predictors];
+b = regress(train, Xtrain);
+Xtest = [ones(size(test)) test_predictors];
+y = Xtest*b;
+err = y - test;
