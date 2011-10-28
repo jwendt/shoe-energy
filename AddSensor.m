@@ -114,6 +114,6 @@ function [s v m] = AddSensor(s_0, ...
     v(i,:) = v_0;
     v(i,s(i,:)) = 0;
     for j = 1:num_sensors
-      v(i,j) = sum(g(s(i,:),j));
+      v(i,j) = ~logical(sum(g(s(i,:),j)));
     end
   end
