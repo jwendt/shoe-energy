@@ -50,7 +50,7 @@ lateral = nan(num_steps,1);
 heeltoe = nan(num_steps,1);
 
 %step
-fprintf('  amp & dlds\n');
+%fprintf('  amp & dlds\n');
 for mi=1:num_steps
   running_amp_sum = 0;
 
@@ -77,7 +77,7 @@ for mi=1:num_steps
     upper = step_ends(mi);
     if(upper > num_samples)
       upper = num_samples;
-      fprintf('upper > num_samples!\n');
+      %fprintf('upper > num_samples!\n');
     end
     if(lower < upper)
       amp_at_sensor(mi, si) = max(data(lower:upper, si));
@@ -94,7 +94,7 @@ end
 
 % now that we've calculated all of the amp_at_sensor values, we use them
 % to calculate the lateral_at_sensor and lateral values
-fprintf('  lateral\n');
+%fprintf('  lateral\n');
 for mi=1:num_steps
   % Nifty little bit of code here essentially does a cross product of the
   % left_sensor_amp and right_sensor_amp vectors using the division function
@@ -110,7 +110,7 @@ for mi=1:num_steps
   lateral(mi) = mean(amp_at_sensor(mi,config.outer_side_indices)) - mean(amp_at_sensor(mi, config.inner_side_indices));
 end
 
-fprintf('  heeltoe\n');
+%fprintf('  heeltoe\n');
 % Compute the land_at_sensor values by inspecting the step 
 land_at_sensor = nan(num_steps, num_sensors);
 for mi=1:num_steps
@@ -119,7 +119,7 @@ for mi=1:num_steps
     upper = step_ends(mi) + 1;
     if(upper > num_samples)
       upper = num_samples;
-      fprintf('upper > num_samples!\n');
+      %fprintf('upper > num_samples!\n');
     end
     if(lower < upper)
       threshold = threshold_percent * max(data(lower:upper, si));
