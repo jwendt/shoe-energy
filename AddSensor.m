@@ -109,7 +109,7 @@ function [s v m] = AddSensor(s_0, ...
 
   % invalidate sensors that are either predictors or
   % connected to predictors
-  v = logical(zeros(length(ranked_indices), num_sensors));
+  v = logical(ones(length(ranked_indices), num_sensors));
   for i = 1:length(ranked_indices)
     v(i,:) = v_0;
     v(i,s(i,:)) = 0;

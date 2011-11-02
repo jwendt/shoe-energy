@@ -1,4 +1,4 @@
-function [s v m] = SelectSensors(sensors_to_select, ...
+function [s v m] = SelectSensors(sensors_to_add, ...
                                  g, ...
                                  K1, ...
                                  K2, ...
@@ -15,7 +15,7 @@ function [s v m] = SelectSensors(sensors_to_select, ...
 % INPUTS:
 % -------
 %
-%   sensors_to_select: number of steps to take (total number
+%   sensors_to_add: number of steps to take (total number
 %                      of sensors to select)
 %   g: logical adjacency matrix
 %      i: sensor
@@ -50,16 +50,16 @@ function [s v m] = SelectSensors(sensors_to_select, ...
 
   [num_steps num_sensors] = size(dlds_at_sensor);
 
-  s = logical(zeros(sensors_to_select, K2, num_sensors));
-  v = logical(ones(sensors_to_select, K2, num_sensors));
-  m = zeros(sensors_to_select, K2, 4);
+  s = logical(zeros(sensors_to_add, K2, num_sensors));
+  v = logical(ones(sensors_to_add, K2, num_sensors));
+  m = zeros(sensors_to_add, K2, 4);
 
   s_0 = logical(zeros(1, num_sensors));
   v_0 = logical(ones(1, num_sensors));
 
   h = waitbar(0, '');
-  for select = 1:sensors_to_select
-    waitbar(0, h, sprintf('... Selecting Sensor %d ...', select));
+  for select = 1:sensors_to_add
+    waitbar(0, h, sprintf('... Adding Sensor %d ...', select));
 
     s_K2 = logical(zeros(K1*K2, num_sensors));
     v_K2 = logical(ones(K1*K2, num_sensors));
