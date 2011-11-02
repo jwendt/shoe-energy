@@ -60,12 +60,20 @@ fprintf(fid,'\n');
 for i=1:num_cica
   % print sensor size
   fprintf(fid,sprintf('%d,',i));
-  best_sensors = find(predictors(i,1,:));
-  for j = 1:length(best_sensors)
+  best_abstract_sensors = find(predictors(i,1,:));
+
+  % Package the groupings list of abstract sensors into a smaller cell to pass
+  % to our PrintSensorGroupingsOnShoe function
+  [best_groupings_list{1:i,1}] = deal(groupings_list{best_abstract_sensors});
+
+  % Print a pretty picture of our shoe
+  PrintSensorGroupingsOnShoe(sprintf('%s/grouping%02d.png',output_path, i), best_groupings_list);
+
+  for j = 1:length(best_abstract_sensors)
     % print each of the best sensors groupings
-    for k = 1:length(groupings_list{best_sensors(j)})
+    for k = 1:length(groupings_list{best_abstract_sensors(j)})
       % print each of the sensors in each grouping
-      fprintf(fid, sprintf('%d;',groupings_list{best_sensors(j)}(k)));
+      fprintf(fid, sprintf('%d;',groupings_list{best_abstract_sensors(j)}(k)));
     end
     fprintf(fid, ',');
   end
