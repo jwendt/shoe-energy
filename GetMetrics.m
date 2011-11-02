@@ -130,8 +130,8 @@ for i = 1:length(input)
     end
 
     % Get sample indices of beginning and ending
-    [left_step_starts left_step_ends] = GetSteps(sum(data.left_foot,2), THRESHOLD_FRACTION);
-    [right_step_starts right_step_ends] = GetSteps(sum(data.right_foot,2), THRESHOLD_FRACTION);
+    [left_step_starts left_step_ends] = GetSteps(sum(foot_data,2), THRESHOLD_FRACTION);
+    %[right_step_starts right_step_ends] = GetSteps(sum(data.right_foot,2), THRESHOLD_FRACTION);
   
     % Use the indices from GetSensorGroupingsFromPedar to build sensor groupings and
     % append them to our data matrices. Previously we found left_dlds, left_amp,
@@ -429,8 +429,8 @@ for mi=1:num_steps
   % Nifty little bit of code here essentially does a cross product of the
   % heel_sensor_land and toe_sensor_land vectors for a given step using the
   % subtraction function between them (H - T)
-  heel_sensor_land = land_at_sensor(mi, heel_side_indices)';
-  toe_sensor_land = land_at_sensor(mi, toe_side_indices);
+  %heel_sensor_land = land_at_sensor(mi, heel_side_indices)';
+  %toe_sensor_land = land_at_sensor(mi, toe_side_indices);
   %H = repmat(heel_sensor_land, 1, length(toe_sensor_land));
   %T = repmat(toe_sensor_land, length(heel_sensor_land), 1);
   %heeltoe_at_sensor(mi, heel_side_indices, toe_side_indices) = H - T;
