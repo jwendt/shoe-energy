@@ -33,7 +33,7 @@ function Y = PrintResults(output_path,...
 %                     prediciton error for metric k (1:dlds, 2:amp, 3:lateral,
 %                     4:heelto) for j ranked sensor grouping of size i.
 %
-%     DLDS, AMP, ALTERAL, HEELTOE, DLDS_AT_SENSOR, etc.
+%     DLDS, AMP, LATERAL, HEELTOE, DLDS_AT_SENSOR, etc.
 
 % make output directory if necessary
 status = mkdir(output_path);
@@ -41,6 +41,33 @@ if(~status)
   error('Error creating output directory %s', output_path);
   return
 end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Plot the correlation of individual sensors to metrics %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+rho = corr(dlds, dlds_at_sensor(:,1:99));
+figure(47)
+clf
+h = PlotFoot(rho.^2, [0 1], 'colorbar');
+saveas(h, sprintf('%s/single_sensor_correlation_dlds.png', output_path));
+
+rho = corr(amp, amp_at_sensor(:,1:99));
+figure(47)
+clf
+h = PlotFoot(rho.^2, [0 1], 'colorbar');
+saveas(h, sprintf('%s/single_sensor_correlation_amp.png', output_path));
+
+rho = corr(lateral, amp_at_sensor(:,1:99));
+figure(47)
+clf
+h = PlotFoot(rho.^2, [0 1], 'colorbar');
+saveas(h, sprintf('%s/single_sensor_correlation_lateral.png', output_path));
+
+rho = corr(heeltoe, land_at_sensor(:,1:99));
+figure(47)
+clf
+h = PlotFoot(rho.^2, [0 1], 'colorbar');
+saveas(h, sprintf('%s/single_sensor_correlation_heeltoe.png', output_path));
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 % Save the top sensors %
@@ -67,7 +94,7 @@ for i=1:num_cica
   [best_groupings_list{1:i,1}] = deal(groupings_list{best_abstract_sensors});
 
   % Print a pretty picture of our shoe
-  PrintSensorGroupingsOnShoe(sprintf('%s/grouping%02d.png',output_path, i), best_groupings_list);
+  PrintSensorGroupingsOnShoe(sprintf('%s/grouping%02d.png', output_path, i), best_groupings_list);
 
   for j = 1:length(best_abstract_sensors)
     % print each of the best sensors groupings

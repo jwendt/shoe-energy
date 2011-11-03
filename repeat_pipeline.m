@@ -1,4 +1,4 @@
-matlabpool 3;
+matlabpool 4;
 
 output = 'output';
 
