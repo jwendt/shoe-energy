@@ -17,7 +17,7 @@ input = {'data/S1.mat',
 input_name = {'S1',
               'S2',
               'S3',
-              'S5',
+              'S4',
               'S5'};
 
 feet = {{'left'},{'right'},{'left','right'}};

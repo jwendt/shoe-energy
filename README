@@ -1,1 +1,4 @@
 git repository for James and Saro working on shoe sensors
+
+UNIX shell command to run the repeat_pipeline_and_exit script in the background (nohup)
+$ matlab -nodisplay -nodesktop -nojvm -nosplash < repeat_pipeline_and_exit.m > repeat_pipeline_and_exit.out &
