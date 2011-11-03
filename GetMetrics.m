@@ -124,26 +124,32 @@ for i = 1:length(input)
   fprintf('Loading ''%s''\n', input{i});
   data = load(input{i});
 
+  % TODO Plotting function below is unnecessary
+  %figure(i); clf; hold on;
+
   for f = 1:length(feet)
+    foot_data = [];
     if(strcmp(feet{f},'left'))
       foot_data = data.left_foot;
     elseif(strcmp(feet{f},'right'))
       foot_data = data.right_foot;
+    else
+      error('feet must be either "left" or "right"\n');
     end
 
     % Get sample indices of beginning and ending
-    [left_step_starts left_step_ends] = GetSteps(sum(foot_data,2), THRESHOLD_FRACTION);
+    [tmp_step_starts tmp_step_ends] = GetSteps(sum(foot_data,2), THRESHOLD_FRACTION);
     %[right_step_starts right_step_ends] = GetSteps(sum(data.right_foot,2), THRESHOLD_FRACTION);
   
     % Use the indices from GetSensorGroupingsFromPedar to build sensor groupings and
     % append them to our data matrices. Previously we found left_dlds, left_amp,
     % etc. using GetMetrics(data.left_foot, ...). Now we append to
     % data.left_foot the mean values of each sensor grouping.
-    fprintf('Calculating %d data samples for each %d sensor groupings for %s foot\n', size(data.left_foot,1), length(groupings_list), feet{f});
-    [num_samples nada] = size(data.left_foot);
-    left_foot_with_groupings = nan(num_samples, length(groupings_list));
+    num_samples = size(foot_data,1);
+    fprintf('Calculating %d data samples for each %d sensor groupings for %s foot\n', num_samples, length(groupings_list), feet{f});
+    tmp_foot_with_groupings = nan(num_samples, length(groupings_list));
     for group = 1:length(groupings_list)
-      left_foot_with_groupings(:,group) = mean(data.left_foot(:,groupings_list{group}),2);
+      tmp_foot_with_groupings(:,group) = mean(foot_data(:,groupings_list{group}),2);
     end
   
     % Calculate metrics
@@ -152,56 +158,38 @@ for i = 1:length(input)
     %       issue is we're calculating lateral using outer_side_indices and
     %       inner_side_indices, when really we should only be using the defaults.
     fprintf('Calculating %s foot metrics\n', feet{f});
-    [left_dlds...
-     left_amp...
-     left_lateral...
-     left_heeltoe...
-     left_dlds_at_sensor...
-     left_amp_at_sensor...
-     left_land_at_sensor] = GetMetricsFromSingleDataSource(left_foot_with_groupings,...
-                                                           left_step_starts,...
-                                                           left_step_ends,...
-                                                           THRESHOLD_FRACTION,...
-                                                           outer_side_indices,...
-                                                           inner_side_indices,...
-                                                           heel_side_indices,...
-                                                           toe_side_indices);
-    raw_data{i, f} = left_foot_with_groupings;
-    % Plotting functions below are unnecessary
+    [tmp_dlds...
+     tmp_amp...
+     tmp_lateral...
+     tmp_heeltoe...
+     tmp_dlds_at_sensor...
+     tmp_amp_at_sensor...
+     tmp_land_at_sensor] = GetMetricsFromSingleDataSource(tmp_foot_with_groupings,...
+                                                          tmp_step_starts,...
+                                                          tmp_step_ends,...
+                                                          THRESHOLD_FRACTION,...
+                                                          outer_side_indices,...
+                                                          inner_side_indices,...
+                                                          heel_side_indices,...
+                                                          toe_side_indices);
+    raw_data{i, f} = tmp_foot_with_groupings;
+    % TODO Plotting function below is unnecessary
     %{
-    figure(i); clf; hold on;
-    subplot(2,1,1);
-    plot(sum(data.left_foot,2), '-b');
+    subplot(2,1,f);
+    plot(sum(foot_data,2), '-b');
     hold on;
     a = axis; max_amp = a(3); min_amp = a(4);
-    title(sprintf('left S%d', i));
-    for j=1:length(left_step_starts)
-      plot([left_step_starts(j) left_step_starts(j)],[min_amp max_amp],'-g');
-      plot([left_step_ends(j) left_step_ends(j)],[min_amp max_amp],'-k');
-    end
-  
-    subplot(2,1,2);
-    plot(sum(data.right_foot,2), '-r');
-    hold on;
-    a = axis; max_amp = a(3); min_amp = a(4);
-    title(sprintf('right S%d', i));
-    for j=1:length(right_step_starts)
-      plot([right_step_starts(j) right_step_starts(j)],[min_amp max_amp],'-g');
-      plot([right_step_ends(j) right_step_ends(j)],[min_amp max_amp],'-k');
+    title(sprintf('%s S%d', feet{f}, i));
+    for j=1:length(tmp_step_starts)
+      plot([tmp_step_starts(j) tmp_step_starts(j)],[min_amp max_amp],'-g');
+      plot([tmp_step_ends(j) tmp_step_ends(j)],[min_amp max_amp],'-k');
     end
     %}
-  
+
     % TODO This section is currently a bottleneck. Must speed it up and try to
     % decrease the memory footprint that it leaves.
     % Split the data into a training portion and testing portions.
     fprintf('Splitting data into train and test\n');
-    tmp_dlds = left_dlds;
-    tmp_amp = left_amp;
-    tmp_lateral = left_lateral;
-    tmp_heeltoe = left_heeltoe;
-    tmp_dlds_at_sensor = left_dlds_at_sensor;
-    tmp_amp_at_sensor = left_amp_at_sensor;
-    tmp_land_at_sensor = left_land_at_sensor;
   
     testing_length = ceil(TESTING_PORTION*length(tmp_dlds));
   
@@ -214,8 +202,8 @@ for i = 1:length(input)
     test_amp_at_sensor = [test_amp_at_sensor; tmp_amp_at_sensor(1:testing_length,:)];
     test_land_at_sensor = [test_land_at_sensor; tmp_land_at_sensor(1:testing_length,:,:)];
   
-    test_step_starts = [test_step_starts left_step_starts(1:testing_length)];
-    test_step_ends = [test_step_ends left_step_ends(1:testing_length)];
+    test_step_starts = [test_step_starts tmp_step_starts(1:testing_length)];
+    test_step_ends = [test_step_ends tmp_step_ends(1:testing_length)];
   
     dlds = [dlds; tmp_dlds(testing_length+1:length(tmp_dlds))];
     amp = [amp; tmp_amp(testing_length+1:length(tmp_amp))];
@@ -226,8 +214,8 @@ for i = 1:length(input)
     amp_at_sensor = [amp_at_sensor; tmp_amp_at_sensor(testing_length+1:length(tmp_amp),:)];
     land_at_sensor = [land_at_sensor; tmp_land_at_sensor(testing_length+1:length(tmp_lateral),:,:)];
     
-    step_starts = [step_starts left_step_starts(testing_length+1:length(left_step_starts))];
-    step_ends = [step_ends left_step_ends(testing_length+1:length(left_step_ends))];
+    step_starts = [step_starts tmp_step_starts(testing_length+1:length(tmp_step_starts))];
+    step_ends = [step_ends tmp_step_ends(testing_length+1:length(tmp_step_ends))];
   
     % TODO implement testing_portion and training_portion over the five sets of
     % possible testing and training portions (five because we do 80/20 training
@@ -260,12 +248,11 @@ for i = 1:length(input)
     %end
 
     clear -regexp 'tmp*'
-    clear left_foot_with_groupings
   end
   clear data
 end
 
-clear -regexp 'left_'
+%clear -regexp 'left_'
 
 
 % JAMES HACK to elimate crappy testing data

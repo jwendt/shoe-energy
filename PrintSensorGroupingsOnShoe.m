@@ -36,6 +36,8 @@ end
 % so that they are colored white
 sensor_vector(sensor_vector == 0) = length(groupings)+1;
 
+figure(47)
+clf
 h = PlotFoot(sensor_vector,[0 length(groupings)+1],'invert');
 saveas(h, filename);
 
