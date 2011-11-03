@@ -2,14 +2,11 @@ matlabpool 3;
 
 output = 'output';
 
-%num_sensors = 15;
-num_sensors = 5;
+num_sensors = 15;
 
-%K1 = 20;
-K1 = 3;
+K1 = 20;
 
-%K2 = 20;
-K2 = 3;
+K2 = 20;
 
 input = {'data/S1.mat',
          'data/S2.mat',
@@ -49,7 +46,8 @@ for i=1:length(input)
   end
 end
 
-for i=1:length(inputs)
+% Parallel for loop
+parfor i=1:length(inputs)
   for f=1:length(feet)
     fprintf('--------------------------\n');
     fprintf('inputs = %s\n', cell2mat(inputs{i}'));
