@@ -155,7 +155,17 @@ end
 % After we've effectively measured land_at_sensor and heeltoe, we set all
 % nan values in land_at_sensor (i.e. those sensors that never saw a rise in
 % pressure above the threshold) to 0.
-land_at_sensor(isnan(land_at_sensor)) = 0;
+%land_at_sensor(isnan(land_at_sensor)) = 0;
+
+% Do linear interpolation to replace those land_at_sensor values that were set
+% never set (i.e. are still set to NaN)
+for i=1:size(land_at_sensor,2)
+  dd = land_at_sensor(:,i);
+  dd_x = find(~isnan(dd));
+  dd_y = dd(~isnan(dd));
+  yi = interp1(dd_x,dd_y,1:length(dd));
+  land_at_sensor(:,i) = yi;
+end
 
 end
 
@@ -213,7 +223,7 @@ end
 %fprintf('number_of_steps = %d, \n', number_of_steps);
 if(number_of_steps < 3)
   % TODO If dlds cannot be measured at a given sensor (due to missing a step),
-  % technically that sensor shoudl still trigger once the following step comes,
+  % technically that sensor should still trigger once the following step comes,
   % effectively doubling its measured dlds value. For simplicity, we just set
   % dlds to 0.
   dlds = 0; %nan; %-9999
