@@ -163,8 +163,14 @@ for i=1:size(land_at_sensor,2)
   dd = land_at_sensor(:,i);
   dd_x = find(~isnan(dd));
   dd_y = dd(~isnan(dd));
-  yi = interp1(dd_x,dd_y,1:length(dd));
-  land_at_sensor(:,i) = yi;
+  if(size(dd_y,1) > 1)
+    % dd_y has at least two data points
+    yi = interp1(dd_x,dd_y,1:length(dd));
+    land_at_sensor(:,i) = yi;
+  else
+    % dd_y cannot be linearly interpolated with <2 data points
+    land_at_sensor(:,i) = 0;
+  end
 end
 
 end
