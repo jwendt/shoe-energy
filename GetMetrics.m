@@ -222,9 +222,9 @@ for i = 1:length(input)
     step_ends = [step_ends tmp_step_ends(testing_length+1:length(tmp_step_ends))];
 
     % SARO ADDED FOR 8PM
-    train_step_starts{i, f} = left_step_starts(testing_length+1:length(left_step_starts));
-    train_step_ends{i, f} = left_step_ends(testing_length+1:length(left_step_ends));
-    train_data{i, f} = left_foot_with_groupings(:,:);
+    train_step_starts{i, f} = tmp_step_starts(testing_length+1:length(tmp_step_starts));
+    train_step_ends{i, f} = tmp_step_ends(testing_length+1:length(tmp_step_ends));
+    train_data{i, f} = tmp_foot_with_groupings(:,:);
   
     % TODO implement testing_portion and training_portion over the five sets of
     % possible testing and training portions (five because we do 80/20 training
