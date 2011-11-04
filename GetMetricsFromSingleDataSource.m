@@ -159,6 +159,8 @@ end
 
 % Do linear interpolation to replace those land_at_sensor values that were set
 % never set (i.e. are still set to NaN)
+% TODO Figure out why some land_at_sensor values are still nan after one pass
+% of linear interpolation.
 for i=1:size(land_at_sensor,2)
   dd = land_at_sensor(:,i);
   dd_x = find(~isnan(dd));
@@ -171,6 +173,30 @@ for i=1:size(land_at_sensor,2)
     % dd_y cannot be linearly interpolated with <2 data points
     land_at_sensor(:,i) = 0;
   end
+end
+
+% For now, just set all NaN values to the first real value above/below them
+col = 1;
+while(col <= size(land_at_sensor,2))
+  row = 1;
+  while(row <= size(land_at_sensor,1))
+    nan_start = row;
+    non_nan = row;
+    while(non_nan <= size(land_at_sensor,1) && isnan(land_at_sensor(non_nan,col)))
+      % Get the range of nan's starting from nan_start
+      non_nan = non_nan+1;
+    end
+    if(non_nan > size(land_at_sensor,1))
+      % There's a NaN at the end of the dataset, replace all the NaN's with the
+      % first non-NaN that precedes this range
+      land_at_sensor(nan_start:non_nan-1,col) = land_at_sensor(nan_start-1,col);
+    else
+      % Set the range of NaNs to the non-NaN value at the end
+      land_at_sensor(nan_start:non_nan-1,col) = land_at_sensor(non_nan,col);
+    end
+    row = non_nan+1;
+  end
+  col = col + 1;
 end
 
 end
