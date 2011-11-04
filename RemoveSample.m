@@ -61,17 +61,19 @@ function [s ...
       % augment the _at_sensor values for this sample
       for input_i = 1:num_inputs
         for foot_i = 1:num_feet
+          % calculate step offset as steps in all previous inputs
+          % plus step in previous foot (if applicable)
           step_offset = sum(sum(num_steps_per_set(1:(input_i-1), :)));
-          step_offset = step_offset + sum(num_steps_per_set(input_i, 1:(foot_i-1)));
+          step_offset = step_offset + ...
+              sum(num_steps_per_set(input_i, 1:(foot_i-1)));
+
+          % remove sample from all steps (augment predictors)
           for step_i = 1:num_steps_per_set(input_i, foot_i)
             flattened_step_i = step_i + step_offset;
             sample_i = step_starts{input_i, foot_i}(step_i) + j;
             if sample_i <= step_ends{input_i, foot_i}(step_i)
-              v_temp = logical(v_0(:,k));
-              v_temp(j) = 0;
-
               % augment dlds
-              if step_i+2 <= num_steps_per_set(input_i, foot_i)
+              if step_i+1 < num_steps_per_set(input_i, foot_i)
                 lower1 = step_starts{input_i, foot_i}(step_i);
                 upper1 = step_ends{input_i, foot_i}(step_i);
                 lower2 = step_starts{input_i, foot_i}(step_i+1);
@@ -79,50 +81,91 @@ function [s ...
                 lower3 = step_starts{input_i, foot_i}(step_i+2);
                 upper3 = step_ends{input_i, foot_i}(step_i+2);
 
-                data_temp1 = data{input_i, foot_i}(lower1:upper1, k);
-                data_temp2 = data{input_i, foot_i}(lower2:upper2, k);
-                data_temp3 = data{input_i, foot_i}(lower3:upper3, k);
+                data1 = data{input_i, foot_i}(lower1:upper1, k);
+                data2 = data{input_i, foot_i}(lower2:upper2, k);
+                data3 = data{input_i, foot_i}(lower3:upper3, k);
 
-                data_temp1(v_temp(1:(upper1-lower1))) = nan;
-                data_temp2(v_temp(1:(upper2-lower2))) = nan;
-                data_temp3(v_temp(1:(upper3-lower3))) = nan;
+                data1(~s(samples_removed,1:(upper1-lower1+1),k)) = nan;
+                data2(~s(samples_removed,1:(upper2-lower2+1),k)) = nan;
+                data3(~s(samples_reomved,1:(upper3-lower3+1),k)) = nan;
+
+                if step_i > 1
+                  data0 = data{input_i, foot_i}(lower1-EXTRA:(lower1-1), k);
+                else
+                  data0 = zeros(0,1);
+                end
+                if step_i+2 < num_steps_per_set(input_i, foot_i)
+                  data4 = data{input_i, foot_i}((upper3+1):upper3+EXTRA, k);
+                else
+                  data4 = zeros(0,1);
+                end
+
+                new_data = [data0; data1; zero1; data2; zero2; data3; data4];
 
                 zero1 = zeros(lower2-upper1-1,1);
                 zero2 = zeros(lower3-upper2-1,1);
 
-                new_dlds = ChangeInLength( ...
-                    [data_temp1; zero1; data_temp2; zero2; data_temp3], ...
-                    THRESHOLD_FRACTION);
-
-                dlds_at_sensor(samples_removed, flattened_step_i, k) = new_dlds;
+                dlds_at_sensor(samples_removed, flattened_step_i, k) = ...
+                    ChangeInLength(new_data, THRESHOLD_FRACTION);
               end
 
               % augment amp
               lower = step_starts{input_i, foot_i}(step_i);
               upper = step_ends{input_i, foot_i}(step_i);
 
-              subset_data = data{input_i, foot_i}(lower : upper, k);
-              valid_data = subset_data(v_temp(1:(upper - lower)));
+              subset_data = data{input_i, foot_i}(lower:upper, k);
+              valid_data = subset_data( ...
+                  s(samples_removed,1:(upper-lower+1),k));
 
               [num_new_samples nada] = size(valid_data);
               if num_new_samples == 0
                 amp_at_sensor(samples_removed, flattened_step_i, k) = 0;
               else
-                new_amp = max(valid_data);
-                amp_at_sensor(samples_removed, flattened_step_i, k) = new_amp;
+                amp_at_sensor(samples_removed, flattened_step_i, k) = ...
+                    max(valid_data);
               end
 
               % augment land
-              new_land = 0;
-              threshold = THRESHOLD_FRACTION * ...
-                  max(data{input_i, foot_i}(lower : upper, k));
-              for di=lower:upper
-                if v_temp(di - lower + 1) & data{input_i, foot_i}(di, k) > threshold
-                  new_land = di;
+              data1 = data{input_i, foot_i}(lower:upper, k);
+              if step_i > 1
+                new_lower = lower-1;
+                data0 = data{input_i, foot_i}(lower-1, k);
+              else
+                new_lower = lower;
+                data0 = zeros(0,1);
+              end
+              if step_i < num_steps_per_set(input_i, foot_i)
+                new_upper = upper+1;
+                data2 = data{input_i, foot_i}(upper+1, k);
+              else
+                new_upper = upper;
+                data2 = zeros(0,1);
+              end
+              data1(~s(samples_removed,1:(upper-lower+1),k)) = nan;
+              new_data = [data0; data1; data2];
+
+              new_land = nan;
+              threshold = THRESHOLD_FRACTION * max(new_data);
+              for di=1:length(new_data)
+                if new_data(di) > threshold
+                  new_land = di+new_lower-1;
                   break;
                 end
               end
               land_at_sensor(samples_removed, flattened_step_i, k) = new_land;
+
+              % interpolate nands in land_at_sensor
+              for nan_i=1:size(land_at_sensor,3)
+                dd = land_at_sensor(samples_removed,:,nan_i);
+                dd_x = find(~isnan(dd));
+                dd_y = dd(~isnan(dd));
+                if(size(dd_y,1) > 1)
+                  yi = interp1(dd_x,dd_y,1:length(dd));
+                  land_at_sensor(samples_removed,:,nan_i) = yi;
+                else
+                  land_at_sensor(samples_removed,:,nan_i) = 0;
+                end
+              end
             end
           end
         end

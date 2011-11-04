@@ -22,8 +22,8 @@ function [s ...
   num_samples = 0;
   for i = 1:num_inputs
     for j = 1:num_feet
-      if num_samples < max(step_ends{i,j} - step_starts{i,j})
-        num_samples = max(step_ends{i,j} - step_starts{i,j});
+      if num_samples < max(step_ends{i,j} - step_starts{i,j}) + 1
+        num_samples = max(step_ends{i,j} - step_starts{i,j}) + 1;
       end
     end
   end
