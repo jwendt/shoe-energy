@@ -3,5 +3,6 @@ config.inner_side_indices = [1:2, 6:8, 13:15, 20:22, 27:29, 34:36, 41:43, 48:50,
 config.heel_side_indices = 1:47;
 config.toe_side_indices = 48:99;
 
+% dlds, amp, lateral, heeltoe
 config.ranking_error_thresholds = [0.05 0.05 0.05 0.05];
 config.ranking_error_directions = [-1 -1 -1 -1];

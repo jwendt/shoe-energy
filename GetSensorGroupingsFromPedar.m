@@ -88,7 +88,7 @@ shoe_heel = config.heel_side_indices;
 shoe_toe = config.toe_side_indices;
 
 % Flip shoe upside down just so that we always start our groupings enumerations
-% with sensor 1. This step is not necessary, but helps a little with radability
+% with sensor 1. This step is not necessary, but helps a little with readability
 % if/when debugging the sensor groupings.
 shoe_image = flipud(shoe_image);
 [shoe_length shoe_width] = size(shoe_image);
