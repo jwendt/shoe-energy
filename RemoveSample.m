@@ -15,9 +15,11 @@ function [s ...
                                          dlds, ...
                                          amp, ...
                                          lateral, ...
-                                         heeltoe);
+                                         heeltoe, ...
+                                         h);
   THRESHOLD_FRACTION = 0.15;
   TESTING_PORTION = 0.2;
+  EXTRA = 20;
 
   LoadConstants;
 
@@ -40,6 +42,7 @@ function [s ...
   samples_removed = 0;
   for j = 1:num_samples
     for k = 1:num_sensors
+      waitbar(((j-1)*num_sensors+(k-1))/(num_samples*num_sensors), h);
       % ignore sample if it's already in the removed list
       if ~s_0(j,k)
         continue;
@@ -87,7 +90,7 @@ function [s ...
 
                 data1(~s(samples_removed,1:(upper1-lower1+1),k)) = nan;
                 data2(~s(samples_removed,1:(upper2-lower2+1),k)) = nan;
-                data3(~s(samples_reomved,1:(upper3-lower3+1),k)) = nan;
+                data3(~s(samples_removed,1:(upper3-lower3+1),k)) = nan;
 
                 if step_i > 1
                   data0 = data{input_i, foot_i}(lower1-EXTRA:(lower1-1), k);
@@ -100,10 +103,10 @@ function [s ...
                   data4 = zeros(0,1);
                 end
 
-                new_data = [data0; data1; zero1; data2; zero2; data3; data4];
-
                 zero1 = zeros(lower2-upper1-1,1);
                 zero2 = zeros(lower3-upper2-1,1);
+
+                new_data = [data0; data1; zero1; data2; zero2; data3; data4];
 
                 dlds_at_sensor(samples_removed, flattened_step_i, k) = ...
                     ChangeInLength(new_data, THRESHOLD_FRACTION);
@@ -154,7 +157,7 @@ function [s ...
               end
               land_at_sensor(samples_removed, flattened_step_i, k) = new_land;
 
-              % interpolate nands in land_at_sensor
+              % interpolate nans in land_at_sensor
               for nan_i=1:size(land_at_sensor,3)
                 dd = land_at_sensor(samples_removed,:,nan_i);
                 dd_x = find(~isnan(dd));
@@ -166,6 +169,35 @@ function [s ...
                   land_at_sensor(samples_removed,:,nan_i) = 0;
                 end
               end
+
+              % finish interpolation
+              %col = 1;
+              %while col <= size(land_at_sensor,3)
+              %  row = 1;
+              %  while row <= size(land_at_sensor,2)
+              %    nan_start = row;
+              %    non_nan = row;
+              %    while non_nan <= size(land_at_sensor,2) && ...
+              %        isnan(land_at_sensor(samples_removed, non_nan, col))
+              %      non_nan = non_nan + 1;
+              %    end
+              %    if non_nan > size(land_at_sensor, 2)
+              %      land_at_sensor(samples_removed, ...
+              %                     nan_start:non_nan-1,col) = ...
+              %          land_at_sensor(samples_removed, nan_start-1,col);
+              %    else
+              %      land_at_sensor(samples_removed, ...
+              %                     nan_start:non_nan-1,col) = ...
+              %          land_at_sensor(samples_removed, non_nan, col);
+              %    end
+              %    row = non_nan+1;
+              %  end
+              %  col = col + 1;
+              %end
+
+              % sanity check
+              land_at_sensor(samples_removed, ...
+                  isnan(land_at_sensor(samples_removed,:,:))) = 0;
             end
           end
         end

@@ -48,8 +48,9 @@ function [s ...
   land_at_sensor_0(1,:,:) = land_at_sensor_in;
 
   h = waitbar(0, '');
+  h2 = waitbar(0, '');
   for select = 1:samples_to_remove
-    waitbar(0, h, sprintf('... Removing Sensor %d ...', select));
+    waitbar(0, h, sprintf('... Removing Sample %d ...', select));
 
     s_K2 = logical(ones(K1*K2, num_samples, num_sensors));
     v_K2 = logical(ones(K1*K2, num_samples, num_sensors));
@@ -61,7 +62,8 @@ function [s ...
     [num_configs nada1 nada2] = size(s_0);
     next_config = 1;
     for c = 1:num_configs
-      waitbar(c / num_configs, h);
+      waitbar((c-1) / num_configs, h);
+      waitbar(0, h2, sprintf('... Trying Config %d/%d ...', c, num_configs));
 
       [s_1 ...
        v_1 ...
@@ -80,7 +82,8 @@ function [s ...
                                         dlds, ...
                                         amp, ...
                                         lateral, ...
-                                        heeltoe);
+                                        heeltoe, ...
+                                        h2);
       [configs_added nada1 nada2] = size(s_1);
 
       s_K2(next_config:(next_config+configs_added-1),:,:) = s_1;
@@ -124,3 +127,4 @@ function [s ...
     land_at_sensor(select,:,:,:) = land_at_sensor_0;
   end
   close(h)
+  close(h2)
