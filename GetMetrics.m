@@ -270,8 +270,12 @@ end
 % 3. run print_results.m
 %{
 start = 1;
-%finish = 50;
-finish = length(test_dlds);
+if(length(test_dlds) < 50)
+  finish = length(test_dlds);
+else
+  finish = 50;
+end
+%finish = length(test_dlds);
 test_dlds = test_dlds(start:finish);
 test_amp = test_amp(start:finish);
 test_lateral = test_lateral(start:finish);
