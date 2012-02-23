@@ -102,25 +102,18 @@ function [s v m] = SelectSensors(sensors_to_add, ...
                                  config.ranking_error_thresholds, ...
                                  config.ranking_error_directions);
 
-    %size(ranked_indices)
-    %next_config
-
-    %figure(select);
-    %hist(ranked_errors);
-    %title(sprintf('select %d', select));
-
     % keep at most top K2 predictors
     if next_config-1 > K2
-      %ranked_indices = ranked_indices(1:K2)e
-      ranked_indices = ranked_indices(GetIndices(K, length(ranked_indices), greed_choice));
+      ranked_indices = ranked_indices(GetIndices(K2, length(ranked_indices), greed_choice));
     end
     s_0 = s_K2(ranked_indices,:);
     v_0 = v_K2(ranked_indices,:);
     m_0 = m_K2(ranked_indices,:);
 
-    s(select,:,:) = s_0;
-    v(select,:,:) = v_0;
-    m(select,:,:) = m_0;
+    % 1:size(s_0,1) let's us deal with K1 < K2
+    s(select,1:size(s_0,1),:) = s_0;
+    v(select,1:size(v_0,1),:) = v_0;
+    m(select,1:size(m_0,1),:) = m_0;
   end
   close(h)
 

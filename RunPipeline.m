@@ -1,5 +1,5 @@
-function Y = RunPipeline(max_sensors, K1, K2, input, left_right, output)
-% RunPipeline(MAX_SENSORS, K1, K2, INPUT, LEFT_RIGHT, OUTPUT)
+function Y = RunPipeline(max_sensors, K1, K2, input, left_right, output, greed_choice)
+% RunPipeline(MAX_SENSORS, K1, K2, INPUT, LR, OUTPUT, CHOICE)
 %   Runs the shoe sensor optimization.
 %
 % Parameters:
@@ -7,17 +7,24 @@ function Y = RunPipeline(max_sensors, K1, K2, input, left_right, output)
 %   MAX_SENSORS   Maximum number of sensor groupings to create (originally
 %                 called num_cica)
 %
-%   K1   ?? Number of new predictor sets to return for each call
+%   K1       ?? Number of new predictor sets to return for each call
+%            Choose only the top K1 sensor groupings from those created by
+%            adding a new sensor to an existing grouping
 %
-%   K2   ?? Number of new predictor sets to return for each step
+%   K2       ?? Number of new predictor sets to return for each step
+%            Choose only the top K2 sensor groupings from all those K1*K2
+%            sensor groupings that were created at each setp
 %
-%   INPUT   A cell array of paths to *.mat files with left and right data
-%           points
+%   INPUT    A cell array of paths to *.mat files with left and right data
+%            points
 %
-%   LEFT_RIGHT   A cell array of size 1 or 2 with the values 'left' and/or
-%                'right'
+%   LR       A cell array of size 1 or 2 with the values 'left' and/or
+%            'right'
 %
 %   OUTPUT   A path to the output folder
+%
+%   CHOICE   Explained by GetIndices functoin. Choices are 'greedy', 'rep', and
+%            'greedy-rep'
 
 %%%%%%%%%%%%%%%%%%
 % Configurations %
@@ -123,7 +130,6 @@ g = PruneGraph(prediction_graph, ...
                heeltoe_threshold);
 
 fprintf('Perform a variant of CICA to select best sensor groupings\n');
-greed_choice = 'greedy-rep';
 [s v m] = SelectSensors(max_sensors,...
                         g,...
                         K1,...
@@ -135,7 +141,7 @@ greed_choice = 'greedy-rep';
                         dlds_at_sensor,...
                         amp_at_sensor,...
                         land_at_sensor,...
-                        greedy_or_not);
+                        greed_choice);
 
 fprintf(sprintf('Saving results to %s\n', output));
 PrintResults(output,...
