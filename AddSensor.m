@@ -8,7 +8,8 @@ function [s v m] = AddSensor(s_0, ...
                              heeltoe, ...
                              dlds_at_sensor, ...
                              amp_at_sensor, ...
-                             land_at_sensor)
+                             land_at_sensor, ...
+                             greed_choice)
 % AddSensor Returns top K sets of predictors by adding 
 %           one more predictor to the input set.
 %
@@ -30,6 +31,7 @@ function [s v m] = AddSensor(s_0, ...
 %   K: number of new predictor sets to return
 %   dlds...heeltoe: metrics to predict
 %   *_at_sensor: predictor metrics at each sensor
+%   greed_choice: 'greedy', 'rep', or 'greedy-rep' from GetIndices.m
 %
 % --------
 % OUTPUTS:
@@ -102,7 +104,7 @@ function [s v m] = AddSensor(s_0, ...
 
   % keep at most top K predictors
   if sensors_added > K
-    ranked_indices = ranked_indices(1:K);
+    ranked_indices = ranked_indices(GetIndices(K, length(ranked_indices), greed_choice));
   end
   m = m(ranked_indices,:);
   s = s(ranked_indices,:);

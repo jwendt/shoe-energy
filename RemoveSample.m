@@ -40,22 +40,25 @@ function [s ...
   land_at_sensor = zeros(num_samples*num_sensors, num_steps, num_sensors);
 
   samples_removed = 0;
-  for j = 1:num_samples
+  for j = 1:(num_samples/4)
     for k = 1:num_sensors
-      waitbar(((j-1)*num_sensors+(k-1))/(num_samples*num_sensors), h);
+      waitbar(((j-1)*num_sensors+(k-1))/(num_samples/4*num_sensors), h);
       % ignore sample if it's already in the removed list
-      if ~s_0(j,k)
+      if ~s_0((j-1)*4+1,k)
         continue;
       end
       % ignore sample if it's not a valid sample
-      if ~v_0(j,k)
+      if ~v_0((j-1)*4+1,k)
         continue;
       end
 
       % try removing this sample
       samples_removed = samples_removed + 1;
       s(samples_removed,:,:) = s_0;
-      s(samples_removed,j,k) = 0;
+      s(samples_removed,(j-1)*4+1,k) = 0;
+      s(samples_removed,(j-1)*4+2,k) = 0;
+      s(samples_removed,(j-1)*4+3,k) = 0;
+      s(samples_removed,(j-1)*4+4,k) = 0;
 
       dlds_at_sensor(samples_removed,:,:) = dlds_at_sensor_0;
       amp_at_sensor(samples_removed,:,:) = amp_at_sensor_0;

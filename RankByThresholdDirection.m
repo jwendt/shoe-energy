@@ -1,4 +1,5 @@
-function [indices, thresholds_reached, groupings] = RankByThresholdDirection(observations, thresholds, directions)
+function [indices, thresholds_reached, groupings, errors] = RankByThresholdDirection(observations, thresholds, directions)
+% [INDICES, THRESHOLDS_REACHED, GROUPINGS, ERR] =
 % RankByThresholdDirection Sorts measurement's rows in ascending order by a
 %                          fancy pants algorithm.
 %
@@ -102,10 +103,12 @@ end
 % grouping to last) to final index vector
 % TODO handle ties correctly
 indices = [];
+errors = [];
 for i = 1:num_groupings
   [sorted_errors sorted_indices] = sort(groupings{i, COL_ERROR});
   if ~isempty(sorted_indices)
     indices = [indices; groupings{i, COL_OBSERVATION}(sorted_indices,1)];
+    errors = [errors; sorted_errors];
   end
 end
 

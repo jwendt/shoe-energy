@@ -16,6 +16,23 @@ function [s ...
                                           amp, ... 
                                           lateral, ...
                                           heeltoe)
+% samples_to_remove is 412 (or 412/4?)
+%
+% data comes from train_data from GetMetrics
+%
+% step_starts comes from train_step_starts from GetMetrics
+%
+% step_ends comes from train_step_starts from GetMetrics
+%
+% *_at_sensor_in is a subset of dlds_at_sensor(:,cols) where cols is some
+% number of wants sensors
+%
+% dlds,amp,lateral,heeltoe are the regular vectors used everywhere
+%
+%
+%
+%
+%
   LoadConstants;
 
   [num_inputs num_feet] = size(step_ends);
@@ -49,7 +66,7 @@ function [s ...
 
   h = waitbar(0, '');
   h2 = waitbar(0, '');
-  for select = 1:samples_to_remove
+  for select = 159:samples_to_remove
     waitbar(0, h, sprintf('... Removing Sample %d ...', select));
 
     s_K2 = logical(ones(K1*K2, num_samples, num_sensors));
